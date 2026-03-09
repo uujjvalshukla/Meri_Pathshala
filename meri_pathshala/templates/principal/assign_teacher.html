@@ -1,0 +1,100 @@
+{% extends "base/base.html" %}
+{% block title %}Assign Teacher{% endblock %}
+
+{% block content %}
+
+<div class="assign-teacher-page">
+
+  <h3 class="page-heading">
+    Assign Teacher to Class & Subject
+  </h3>
+
+  <!-- Assignment Form -->
+  <form method="post" class="assign-teacher-form">
+    {% csrf_token %}
+
+    <div class="form-row">
+
+      <div class="form-field">
+        <label>Teacher</label>
+        <select name="teacher_id" required>
+          {% for t in teachers %}
+            <option value="{{ t.id }}">
+              {{ t.user.username }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Class</label>
+        <select name="class_id" required>
+          {% for c in classes %}
+            <option value="{{ c.id }}">
+              {{ c.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Subject</label>
+        <select name="subject_id" required>
+          {% for s in subjects %}
+            <option value="{{ s.id }}">
+              {{ s.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">
+        Assign
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Assigned Teachers Table -->
+  <div class="assigned-teachers-section">
+
+    <h4 class="section-title">
+      Assigned Teachers
+    </h4>
+
+    <table class="data-table">
+
+      <thead>
+        <tr>
+          <th>Teacher</th>
+          <th>Class</th>
+          <th>Subject</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for m in mappings %}
+        <tr>
+          <td>{{ m.teacher.user.username }}</td>
+          <td>{{ m.school_class.name }}</td>
+          <td>{{ m.subject.name }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="empty-text">
+            No assignments yet
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base/base.html" %}
+{% block title %}Create Assignment{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'teacher_dashboard' %}">
+    ⬅ Back to Dashboard
+</a>
+
+<div class="create-assignment-page">
+
+  <h3 class="page-heading">Create Assignment</h3>
+
+  <div class="create-assignment-layout">
+
+    <!-- ================= MAIN FORM ================= -->
+    <div class="assignment-form-section">
+
+      <form method="post" class="assignment-form">
+        {% csrf_token %}
+
+        <div class="form-field">
+          <label>Class</label>
+          <select name="school_class">
+            {% for c in form.school_class.field.queryset %}
+              <option value="{{ c.id }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Subject</label>
+          <select name="subject">
+            {% for s in form.subject.field.queryset %}
+              <option value="{{ s.id }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Title</label>
+          <input name="title">
+        </div>
+
+        <div class="form-field">
+          <label>Description / Questions</label>
+          <textarea name="description" rows="8"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label>Due Date</label>
+          <input type="date" name="due_date">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">
+            Publish
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+    <!-- ================= AI GENERATOR ================= -->
+<div class="ai-generator-section">
+
+  <h4 class="section-title">Assignment Generator </h4>
+
+  <div class="ai-form">
+
+    <div class="form-field">
+      <label>Board</label>
+      <input value="NCERT" disabled>
+    </div>
+
+    <div class="form-field">
+      <label>Class</label>
+      <select id="ai-class">
+        <option value="5">Class 5</option>
+        <option value="6">Class 6</option>
+        <option value="7">Class 7</option>
+        <option value="8">Class 8</option>
+        <option value="9">Class 9</option>
+        <option value="10">Class 10</option>
+        <option value="11">Class 11</option>
+        <option value="12">Class 12</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label>Chapter Name</label>
+      <input id="ai-chapter" placeholder="e.g. Fractions">
+    </div>
+
+    <div class="form-field">
+      <label>No. of Questions</label>
+      <input id="ai-count" type="number" value="10">
+    </div>
+
+    <div class="form-actions">
+      <button type="button" onclick="generateAI()">
+        Generate
+      </button>
+    </div>
+    {% comment %}            Give max mark in asssignment              {% endcomment %}
+    
+       <div class="form-field">
+  <label>Maximum Marks</label>
+  <input type="number" name="max_marks" value="{{ assignment.max_marks|default:10 }}" required>
+       </div>
+  </div>
+
+</div>
+ 
+{% comment %}       Use JavaScript        {% endcomment %}
+
+<script>
+function generateAI() {
+  const board = "NCERT";
+  const cls = document.getElementById("ai-class").value;
+  const chapter = document.getElementById("ai-chapter").value;
+  const count = document.getElementById("ai-count").value;
+
+  if (!chapter) {
+    alert("Please enter chapter name");
+    return;
+  }
+
+  fetch("{% url 'teacher_ai_generate' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      board: board,
+      class_name: cls,
+      chapter: chapter,
+      num_questions: count
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.querySelector("textarea[name='description']").value = data.assignment;
+  });
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+
+  <!-- MAIN CSS -->
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+
+{% include "base/partials/navbar.html" %}
+{% include "base/partials/alerts.html" %}
+
+
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+
+</body>
+</html>

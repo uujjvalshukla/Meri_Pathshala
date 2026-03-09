@@ -1,0 +1,91 @@
+{% extends "base/base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <h3 class="page-heading">
+    Welcome {{ student.user.username }}
+  </h3>
+
+  <div class="card">
+
+    <div class="card-header">
+      Assignments — Class {{ student.school_class.name }}
+    </div>
+
+    <div class="card-body">
+
+      {% if rows %}
+
+      <table class="data-table">
+
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Marks</th>
+            <th>Feedback</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+        {% for row in rows %}
+        <tr>
+
+          <td>{{ row.assignment.title }}</td>
+          <td>{{ row.assignment.subject.name }}</td>
+
+          <td>
+            {% if row.submission %}
+              {% if row.submission.marks %}
+                <span class="status status-checked">Checked</span>
+              {% else %}
+                <span class="status status-submitted">
+                  Submitted
+                </span>
+              {% endif %}
+            {% else %}
+              <span class="status status-pending">Pending</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {{ row.submission.marks|default:"-" }}
+          </td>
+
+          <td>
+            {{ row.submission.feedback|default:"-" }}
+          </td>
+
+          <td>
+            <a
+              href="{% url 'student_assignment_detail' row.assignment.id %}"
+              class="action-link"
+            >
+              View
+            </a>
+          </td>
+
+        </tr>
+        {% endfor %}
+
+        </tbody>
+
+      </table>
+
+      {% else %}
+        <p class="empty-text">No assignments yet.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

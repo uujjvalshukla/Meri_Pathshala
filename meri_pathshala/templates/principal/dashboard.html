@@ -1,0 +1,58 @@
+{% extends "base/base.html" %}
+{% block title %}Principal Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <h3 class="page-heading">Principal Dashboard</h3>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-label">Students</div>
+      <div class="stat-value">220</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Teachers</div>
+      <div class="stat-value">18</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Assignments</div>
+      <div class="stat-value">35</div>
+    </div>
+
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card mt-3">
+
+    <div class="card-header">
+      Quick Actions
+    </div>
+
+    <div class="card-body action-list">
+
+      <a
+        href="{% url 'principal_manage_users' %}"
+        class="primary-action"
+      >
+        Manage Users
+      </a>
+
+      <a
+        href="{% url 'principal_assign_teacher' %}"
+        class="secondary-action"
+      >
+        Assign Teacher
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

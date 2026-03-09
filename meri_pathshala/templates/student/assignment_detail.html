@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submission Detail — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg-0: #070a12;
+    --bg-1: #0b1220;
+    --surface: rgba(255,255,255,0.06);
+    --line: rgba(255,255,255,0.09);
+    --text: rgba(255,255,255,0.92);
+    --text-2: rgba(255,255,255,0.55);
+    --brand: #7c3aed;
+    --ease: cubic-bezier(.2,.8,.2,1);
+    --ease2: cubic-bezier(.16,1,.3,1);
+  }
+
+  html, body { height:100%; font-family:'Sora',sans-serif; }
+
+  body {
+    background:
+      radial-gradient(1100px 600px at 8% 8%,  rgba(124,58,237,0.20), transparent 55%),
+      radial-gradient(800px  500px at 92% 18%, rgba(56,189,248,0.15), transparent 55%),
+      radial-gradient(800px  600px at 42% 92%, rgba(251,113,133,0.13), transparent 60%),
+      linear-gradient(180deg, #070a12, #0b1220 45%, #070a12 100%);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Navbar ── */
+  .main-nav {
+    background: rgba(7,10,18,0.78);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(16px);
+    padding: 13px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; top:0; z-index:20;
+  }
+  .nav-brand { font-weight:800; font-size:15px; letter-spacing:-0.02em; }
+  .nav-brand span { color:#a78bfa; }
+  .nav-right { display:flex; gap:18px; align-items:center; font-size:13px; color:rgba(255,255,255,0.60); }
+  .nav-right a { color:rgba(255,255,255,0.60); text-decoration:none; font-weight:600; transition:color 160ms; }
+  .nav-right a:hover { color:#fff; }
+
+  /* ── Page ── */
+  .sd-page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  /* ── Breadcrumb ── */
+  .sd-breadcrumb {
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase;
+    color:rgba(255,255,255,0.32); margin-bottom:30px;
+  }
+  .sd-breadcrumb a { color:rgba(255,255,255,0.32); text-decoration:none; transition:color 160ms; }
+  .sd-breadcrumb a:hover { color:rgba(255,255,255,0.65); }
+  .sd-breadcrumb-sep { opacity:0.35; margin:0 2px; }
+
+  /* ── Header ── */
+  .sd-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:32px; flex-wrap:wrap; }
+  .sd-student-row { display:flex; align-items:center; gap:16px; margin-bottom:12px; }
+  .sd-avatar {
+    width:52px; height:52px; border-radius:15px;
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:20px; color:#fff; flex-shrink:0;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.38);
+  }
+  .sd-student-name { font-size:27px; font-weight:800; letter-spacing:-0.03em; line-height:1.15; }
+  .sd-assignment-title { font-size:14px; font-weight:600; color:rgba(167,139,250,0.90); margin-top:2px; }
+
+  .sd-meta-pills { display:flex; gap:10px; flex-wrap:wrap; }
+  .sd-pill {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 13px; border-radius:99px;
+    font-size:12px; font-weight:600;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
+    color:rgba(255,255,255,0.58);
+  }
+
+  /* ── Grid ── */
+  .sd-grid { display:grid; grid-template-columns:1.52fr 1fr; gap:20px; align-items:start; }
+  @media(max-width:1024px){ .sd-grid{ grid-template-columns:1fr; } }
+
+  /* ── Card base ── */
+  .sd-card {
+    background: linear-gradient(155deg, rgba(255,255,255,0.078) 0%, rgba(255,255,255,0.032) 100%);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 22px 65px rgba(0,0,0,0.32);
+    overflow: hidden;
+    animation: cardIn 480ms var(--ease2) both;
+  }
+  .sd-card:nth-child(1){ animation-delay:40ms; }
+  .sd-card:nth-child(2){ animation-delay:90ms; }
+  .sd-card:nth-child(3){ animation-delay:140ms; }
+  .sd-card:nth-child(4){ animation-delay:190ms; }
+  @keyframes cardIn {
+    from{ opacity:0; transform:translateY(18px); }
+    to  { opacity:1; transform:translateY(0);    }
+  }
+
+  .sd-card-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:17px 22px 15px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .sd-card-label {
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;
+    color:rgba(255,255,255,0.40);
+  }
+  .dot {
+    width:7px; height:7px; border-radius:50%;
+  }
+  .dot-blue  { background:#38bdf8; box-shadow:0 0 8px #38bdf8bb; }
+  .dot-purple{ background:#a78bfa; box-shadow:0 0 8px #a78bfabb; }
+  .dot-green { background:#4ade80; box-shadow:0 0 8px #4ade80bb; }
+  .dot-amber { background:#fbbf24; box-shadow:0 0 8px #fbbf24bb; }
+
+  /* ── Answer panel ── */
+  .sd-answer-body { padding:22px; }
+  .sd-answer-text {
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px; line-height:1.78;
+    color:rgba(255,255,255,0.80);
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .sd-extracted-divider {
+    display:flex; align-items:center; gap:12px;
+    margin:22px 0 16px;
+    color:rgba(255,255,255,0.28); font-size:10.5px; font-weight:700;
+    letter-spacing:0.09em; text-transform:uppercase;
+  }
+  .sd-extracted-divider::before,
+  .sd-extracted-divider::after {
+    content:''; flex:1; height:1px; background:rgba(255,255,255,0.08);
+  }
+  .sd-extracted-box {
+    background:rgba(56,189,248,0.05); border:1px solid rgba(56,189,248,0.14);
+    border-radius:14px; padding:16px 18px;
+    max-height:300px; overflow-y:auto;
+    font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.72;
+    color:rgba(255,255,255,0.78);
+  }
+  .sd-extracted-box::-webkit-scrollbar { width:5px; }
+  .sd-extracted-box::-webkit-scrollbar-track { background:transparent; }
+  .sd-extracted-box::-webkit-scrollbar-thumb { background:rgba(56,189,248,0.22); border-radius:99px; }
+
+  .sd-file-btn {
+    display:inline-flex; align-items:center; gap:7px;
+    margin-top:0; padding:5px 13px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10);
+    border-radius:10px; font-size:12px; font-weight:600;
+    color:rgba(255,255,255,0.65); text-decoration:none; cursor:pointer;
+    transition:160ms; font-family:'Sora',sans-serif;
+  }
+  .sd-file-btn:hover { background:rgba(255,255,255,0.10); color:#fff; }
+
+  /* ── Right col ── */
+  .sd-right { display:flex; flex-direction:column; gap:18px; }
+
+  /* ── Evaluate card ── */
+  .sd-eval-body { padding:20px 22px; }
+  .sd-eval-body p { font-size:13px; color:rgba(255,255,255,0.45); margin-bottom:16px; line-height:1.6; }
+
+  .btn-evaluate {
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    width:100%; padding:13px 20px;
+    background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 60%,#2563eb 100%);
+    color:#fff; font-family:'Sora',sans-serif; font-weight:700; font-size:14px;
+    border:none; border-radius:14px; cursor:pointer; letter-spacing:0.02em;
+    box-shadow:0 12px 36px rgba(124,58,237,0.30), 0 4px 12px rgba(0,0,0,0.30);
+    transition:transform 200ms var(--ease), box-shadow 220ms, filter 200ms;
+    position:relative; overflow:hidden; text-decoration:none;
+  }
+  .btn-evaluate::after {
+    content:''; position:absolute; inset:-60% -80%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
+    transform:rotate(20deg) translateX(-80%);
+    transition:transform 500ms var(--ease2);
+  }
+  .btn-evaluate:hover {
+    transform:translateY(-2px);
+    box-shadow:0 20px 50px rgba(124,58,237,0.40), 0 6px 16px rgba(0,0,0,0.36);
+    filter:brightness(1.07);
+  }
+  .btn-evaluate:hover::after { transform:rotate(20deg) translateX(80%); }
+  .btn-evaluate:active { transform:translateY(0) scale(0.99); }
+
+  /* ── AI Score card ── */
+  .sd-ai-body { padding:22px; }
+
+  .sd-score-row { display:flex; align-items:center; gap:22px; margin-bottom:22px; }
+  .sd-score-ring { position:relative; width:86px; height:86px; flex-shrink:0; }
+  .sd-score-ring svg { transform:rotate(-90deg); width:86px; height:86px; }
+  .ring-track { fill:none; stroke:rgba(255,255,255,0.07); stroke-width:7; }
+  .ring-fill  { fill:none; stroke-width:7; stroke-linecap:round; }
+  .ring-good  { stroke:#4ade80; filter:drop-shadow(0 0 6px #4ade8090); }
+  .sd-score-num {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:24px; letter-spacing:-0.04em; color:rgba(255,255,255,0.96);
+  }
+  .sd-score-info { flex:1; }
+  .sd-score-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.35); margin-bottom:4px; }
+  .sd-score-fraction { font-size:30px; font-weight:800; letter-spacing:-0.04em; line-height:1; margin-bottom:8px; }
+  .sd-score-fraction sub { font-size:16px; opacity:0.42; letter-spacing:-0.02em; }
+  .chip {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 11px; border-radius:99px;
+    font-size:11px; font-weight:700; letter-spacing:0.04em;
+  }
+  .chip-good { background:rgba(74,222,128,0.12); color:#4ade80; border:1px solid rgba(74,222,128,0.22); }
+  .chip-avg  { background:rgba(251,191,36,0.12);  color:#fbbf24; border:1px solid rgba(251,191,36,0.22); }
+
+  .sd-feedback-toggle {
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; padding:11px 15px;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+    border-radius:12px; font-family:'Sora',sans-serif; font-size:13px; font-weight:600;
+    color:rgba(255,255,255,0.70); cursor:pointer; transition:160ms;
+  }
+  .sd-feedback-toggle:hover { background:rgba(255,255,255,0.09); color:#fff; }
+  .toggle-icon { width:17px; height:17px; opacity:0.50; transition:transform 260ms var(--ease2); }
+  .sd-feedback-toggle.open .toggle-icon { transform:rotate(180deg); opacity:0.90; }
+
+  .sd-feedback-body {
+    display:none; margin-top:12px;
+    padding:16px 18px;
+    background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.14);
+    border-radius:14px;
+    font-size:13.5px; line-height:1.74; color:rgba(255,255,255,0.80);
+  }
+  .sd-feedback-body.active { display:block; animation:fadeIn 220ms ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── Teacher form ── */
+  .sd-teacher-body { padding:22px; }
+  .sd-form-row-label {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em;
+    color:rgba(255,255,255,0.38); display:block; margin-bottom:7px;
+  }
+  .sd-form-field { margin-bottom:16px; }
+  .sd-form-field input[type=number],
+  .sd-form-field textarea {
+    width:100%; padding:11px 14px;
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10);
+    border-radius:12px; font-family:'Sora',sans-serif; font-size:14px;
+    color:rgba(255,255,255,0.90); outline:none; resize:vertical;
+    transition:border-color 160ms, box-shadow 200ms, background 160ms;
+  }
+  .sd-form-field input[type=number] { max-width:110px; }
+  .sd-form-field textarea { min-height:128px; }
+  .sd-form-field input:focus,
+  .sd-form-field textarea:focus {
+    border-color:rgba(124,58,237,0.60);
+    box-shadow:0 0 0 3px rgba(124,58,237,0.13);
+    background:rgba(255,255,255,0.07);
+  }
+  .btn-save {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:13px 20px;
+    background:linear-gradient(135deg,rgba(74,222,128,0.92),rgba(16,185,129,0.88));
+    color:#fff; font-family:'Sora',sans-serif; font-weight:700; font-size:14px;
+    border:1px solid rgba(74,222,128,0.26); border-radius:14px; cursor:pointer;
+    letter-spacing:0.02em;
+    box-shadow:0 10px 32px rgba(74,222,128,0.18), 0 4px 12px rgba(0,0,0,0.28);
+    transition:transform 200ms var(--ease), box-shadow 220ms, filter 200ms;
+    margin-top:4px;
+  }
+  .btn-save:hover {
+    transform:translateY(-2px);
+    box-shadow:0 18px 44px rgba(74,222,128,0.26), 0 6px 16px rgba(0,0,0,0.32);
+    filter:brightness(1.06);
+  }
+  .btn-save:active { transform:translateY(0) scale(0.99); }
+
+  /* ── Header entrance ── */
+  .sd-header { animation: cardIn 420ms var(--ease2) both; }
+  .sd-breadcrumb { animation: cardIn 350ms var(--ease2) both; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="main-nav">
+  <span class="nav-brand">Apna <span>School</span></span>
+  <div class="nav-right">
+    <span>User: teacher1</span>
+    <a href="#">Logout</a>
+  </div>
+</nav>
+
+<div class="sd-page">
+
+  <!-- Breadcrumb -->
+  <nav class="sd-breadcrumb">
+    <a href="#">← Submissions</a>
+    <span class="sd-breadcrumb-sep">/</span>
+    <span>Evaluation Detail</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="sd-header">
+    <div>
+      <div class="sd-student-row">
+        <div class="sd-avatar">B</div>
+        <div>
+          <div class="sd-student-name">betu1</div>
+          <div class="sd-assignment-title">A Letter to God</div>
+        </div>
+      </div>
+      <div class="sd-meta-pills">
+        <span class="sd-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Feb. 28, 2026, 10:52 a.m.
+        </span>
+        <span class="sd-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          Max 20 marks
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="sd-grid">
+
+    <!-- ═══ LEFT: Answer ═══ -->
+    <div class="sd-card">
+      <div class="sd-card-header">
+        <div class="sd-card-label">
+          <span class="dot dot-blue"></span>
+          Student Answer
+        </div>
+        <button class="sd-file-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          View File
+        </button>
+      </div>
+
+      <div class="sd-answer-body">
+        <div class="sd-extracted-divider">Extracted From Uploaded File</div>
+        <div class="sd-extracted-box">A Letter To God
+
+Ans. 1:-
+Lencho's house was situated on the crest of a low hill, overlooking the river and his ripe corn fields.
+
+Ans 2:-
+The only thing the field needed was a downpour or, at the very least, a light shower of rain.
+
+Ans 3:-
+Lencho had great faith in God and believed that God would help him in his time of crisis. He had the firm belief that the eyes of God see everything, even what is deep in one's conscience.
+
+Ans 4:-
+Lencho wrote a letter to God asking for a hundred pesos so that he could sow his field again and live until the crop came, because without it, his family would go hungry.
+
+Ans 5:-
+The postmaster was surprised and moved by Lencho's faith. He did not want to shake Lencho's belief in God, so he decided to collect money from his employees and friends to send to Lencho.</div>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: Evaluation ═══ -->
+    <div class="sd-right">
+
+      <!-- Evaluate card -->
+      <div class="sd-card">
+        <div class="sd-card-header">
+          <div class="sd-card-label">
+            <span class="dot dot-purple"></span>
+            AI Evaluation
+          </div>
+        </div>
+        <div class="sd-eval-body">
+          <p>Run AI analysis to get an automated score and detailed feedback for this submission.</p>
+          <a href="#" class="btn-evaluate">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Evaluate with AI
+          </a>
+        </div>
+      </div>
+
+      <!-- AI Score card -->
+      <div class="sd-card">
+        <div class="sd-card-header">
+          <div class="sd-card-label">
+            <span class="dot dot-amber"></span>
+            AI Suggested Score
+          </div>
+        </div>
+        <div class="sd-ai-body">
+
+          <div class="sd-score-row">
+            <div class="sd-score-ring">
+              <svg viewBox="0 0 86 86">
+                <circle class="ring-track" cx="43" cy="43" r="36"/>
+                <circle class="ring-fill ring-good" cx="43" cy="43" r="36"
+                  stroke-dasharray="226.2"
+                  stroke-dashoffset="226.2"
+                  id="ring"/>
+              </svg>
+              <div class="sd-score-num">16</div>
+            </div>
+            <div class="sd-score-info">
+              <div class="sd-score-label">Score</div>
+              <div class="sd-score-fraction">16<sub>/20</sub></div>
+              <span class="chip chip-good">✓ Good</span>
+            </div>
+          </div>
+
+          <button class="sd-feedback-toggle" id="fbBtn">
+            <span>AI Feedback</span>
+            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="sd-feedback-body" id="fbBody">
+            The student has demonstrated a solid understanding of the lesson "A Letter to God." All five answers are accurate and relevant. The descriptions of Lencho's house, the need for rain, his faith, the purpose of writing the letter, and the postmaster's reaction are all correctly stated. However, the answers could be more detailed and elaborate — for full marks, students should provide more context and use richer language from the text. Marks deducted: −4 for brevity and lack of textual references.
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Save card -->
+      <div class="sd-card">
+        <div class="sd-card-header">
+          <div class="sd-card-label">
+            <span class="dot dot-green"></span>
+            Save Evaluation
+          </div>
+        </div>
+        <div class="sd-teacher-body">
+          <div class="sd-form-field">
+            <label class="sd-form-row-label">Marks</label>
+            <input type="number" value="16" min="0" max="20">
+          </div>
+          <div class="sd-form-field">
+            <label class="sd-form-row-label">Teacher Feedback</label>
+            <textarea>The student has demonstrated a solid understanding of the lesson "A Letter to God." All five answers are accurate and relevant. However, answers could be more detailed for full marks.</textarea>
+          </div>
+          <button class="btn-save">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Evaluation
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /sd-grid -->
+
+</div>
+
+<script>
+  // Feedback toggle
+  const btn  = document.getElementById('fbBtn');
+  const body = document.getElementById('fbBody');
+  btn.addEventListener('click', () => {
+    body.classList.toggle('active');
+    btn.classList.toggle('open');
+  });
+
+  // Ring animation
+  const ring = document.getElementById('ring');
+  const score = 16, total = 20;
+  const circ  = 226.2;
+  const offset = circ * (1 - score / total);
+  setTimeout(() => {
+    ring.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1)';
+    ring.style.strokeDashoffset = offset;
+  }, 180);
+</script>
+</body>
+</html>

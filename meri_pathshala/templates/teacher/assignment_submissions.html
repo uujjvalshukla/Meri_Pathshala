@@ -1,0 +1,109 @@
+{% extends "base/base.html" %}
+{% block title %}Submissions{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'teacher_dashboard' %}">
+    ⬅ Back to Dashboard
+</a>
+
+<div class="assignment-submissions-page">
+
+  <h3 class="page-heading">
+    Submissions — {{ assignment.title }}
+  </h3>
+
+  <div class="submissions-section">
+
+    <table class="data-table">
+
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Submitted At</th>
+          <th>Answer</th>
+          <th>File</th>
+          <th>Marks</th>
+          <th>Feedback</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for s in submissions %}
+        <tr>
+
+          <td>{{ s.student.user.username }}</td>
+
+          <td>{{ s.submitted_at }}</td>
+
+          <td>
+            <div class="answer-preview">
+              <span>
+                {{ s.answer_text|truncatechars:30 }}
+              </span>
+
+              <a href="{% url 'teacher_submission_detail' s.id %}">
+                View
+              </a>
+            </div>
+          </td>
+
+          <td>
+            {% if s.file %}
+              <a href="{{ s.file.url }}" target="_blank">
+                View
+              </a>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+
+          <!-- Per-submission update -->
+          <td colspan="3">
+
+            <form method="post" class="submission-eval-form">
+              {% csrf_token %}
+              <input type="hidden" name="submission_id" value="{{ s.id }}">
+
+              <div class="evaluation-fields">
+
+                <input
+                  type="number"
+                  name="marks"
+                  value="{{ s.marks }}"
+                >
+
+                <input
+                  type="text"
+                  name="feedback"
+                  value="{{ s.feedback }}"
+                >
+
+                <button type="submit">
+                  Save
+                </button>
+
+              </div>
+
+            </form>
+
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="empty-text">
+            No submissions yet
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+{% endblock %}

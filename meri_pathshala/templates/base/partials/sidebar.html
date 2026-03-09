@@ -1,0 +1,70 @@
+<div class="sidebar">
+
+  {% if role == "Student" %}
+    <div class="sidebar-section">
+
+      <div class="sidebar-title">
+        Student Panel
+      </div>
+
+      <ul class="sidebar-list">
+        <li>
+          <a href="{% url 'student_dashboard' %}">
+            Dashboard
+          </a>
+        </li>
+      </ul>
+
+    </div>
+
+  {% elif role == "Teacher" %}
+    <div class="sidebar-section">
+
+      <div class="sidebar-title">
+        Teacher Panel
+      </div>
+
+      <ul class="sidebar-list">
+        <li>
+          <a href="{% url 'teacher_dashboard' %}">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'teacher_create_assignment' %}">
+            Create Assignment
+          </a>
+        </li>
+      </ul>
+
+    </div>
+
+  {% elif role == "Principal" %}
+    <div class="sidebar-section">
+
+      <div class="sidebar-title">
+        Principal Panel
+      </div>
+
+      <ul class="sidebar-list">
+        <li>
+          <a href="{% url 'principal_dashboard' %}">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'principal_manage_users' %}">
+            Manage Users
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'principal_assign_teacher' %}">
+            Assign Teacher
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  {% endif %}
+
+</div>

@@ -1,0 +1,173 @@
+{% extends "base/base.html" %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+
+<div class="manage-users-page">
+
+  <h3 class="page-heading">Manage Users</h3>
+
+  <div class="manage-users-grid">
+
+    <!-- ================= ADD STUDENT ================= -->
+    <div class="user-card">
+
+      <h4 class="section-title">Add Student</h4>
+
+      <form method="post" class="user-form">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="student">
+
+        <div class="form-field">
+          <label>Username</label>
+          <input name="username" required>
+        </div>
+
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+
+        <div class="form-field">
+          <label>Class</label>
+          <select name="class_id" required>
+            {% for c in classes %}
+              <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Roll No</label>
+          <input name="roll_number" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Create Student</button>
+        </div>
+
+      </form>
+
+    </div>
+
+    <!-- ================= ADD TEACHER ================= -->
+    <div class="user-card">
+
+      <h4 class="section-title">Add Teacher</h4>
+
+      <form method="post" class="user-form">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="teacher">
+
+        <div class="form-field">
+          <label>Username</label>
+          <input name="username" required>
+        </div>
+
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+
+        <div class="form-field">
+          <label>Employee ID</label>
+          <input name="employee_id" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Create Teacher</button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- ================= STUDENTS LIST ================= -->
+  <div class="users-list-section">
+
+    <h4 class="section-title">Students List</h4>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Roll No</th>
+          <th>Class</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{{ s.user.username }}</td>
+          <td>{{ s.roll_number }}</td>
+          <td>{{ s.school_class.name }}</td>
+          <td>
+            <a
+              href="{% url 'principal_delete_student' s.id %}"
+              class="danger-link"
+              onclick="return confirm('Delete student?')"
+            >
+              Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="empty-text">
+            No students found
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- ================= TEACHERS LIST ================= -->
+  <div class="users-list-section">
+
+    <h4 class="section-title">Teachers List</h4>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Employee ID</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for t in teachers %}
+        <tr>
+          <td>{{ t.user.username }}</td>
+          <td>{{ t.employee_id }}</td>
+          <td>
+            <a
+              href="{% url 'principal_delete_teacher' t.id %}"
+              class="danger-link"
+              onclick="return confirm('Delete teacher?')"
+            >
+              Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="empty-text">
+            No teachers found
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+
+{% endblock %}

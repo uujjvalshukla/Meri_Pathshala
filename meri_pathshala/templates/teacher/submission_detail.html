@@ -1,0 +1,138 @@
+{% extends "base/base.html" %}
+{% block title %}Submission Detail{% endblock %}
+
+{% block content %}
+
+<div class="submission-page">
+
+  <h2 class="submission-title">
+    {{ submission.student.user.username }} — 
+    {{ submission.assignment.title }}
+  </h2>
+
+  <p class="submission-meta">
+    Submitted at: {{ submission.submitted_at }}
+  </p>
+
+  <div class="submission-wrapper">
+
+    <!-- ================= LEFT SIDE ================= -->
+    <div class="submission-left section-card">
+
+      <h3 class="section-title">Student Answer</h3>
+
+      <div class="answer-box">
+        {% if submission.answer_text %}
+          {{ submission.answer_text|linebreaks }}
+        {% endif %}
+
+        {% if submission.extracted_text %}
+          <hr>
+          <strong>Extracted From Uploaded File:</strong>
+          <div class="extracted-box">
+            {{ submission.extracted_text|linebreaks }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if submission.file %}
+      <div class="file-link" style="margin-top:15px;">
+        <a href="{{ submission.file.url }}" target="_blank">
+          View uploaded file
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- ================= RIGHT SIDE ================= -->
+    {% if not locked %}
+    <div class="submission-right">
+
+      <!-- Evaluate Button -->
+      <div class="section-card">
+        <a href="?ai=1" class="btn btn-evaluate">
+          Evaluate with AI
+        </a>
+      </div>
+
+      <!-- AI Section -->
+      {% if ai_marks_suggestion is not None %}
+      <div class="section-card ai-card">
+
+        <h3 class="section-title">AI Suggested Evaluation</h3>
+
+        <div class="marks-wrapper">
+          <div class="marks-badge 
+            {% if ai_marks_suggestion >= 15 %}marks-good
+            {% elif ai_marks_suggestion >= 8 %}marks-average
+            {% else %}marks-poor
+            {% endif %}">
+            {{ ai_marks_suggestion }}
+          </div>
+
+          <div>
+            <strong>Total:</strong> {{ ai_marks_suggestion }}/{{ submission.assignment.total_marks }}
+          </div>
+        </div>
+
+        <div class="feedback-container">
+          <button type="button" class="feedback-toggle">
+                 Show / Hide Feedback
+            </button>
+          <div class="feedback-box">
+            {{ ai_feedback_suggestion }}
+          </div>
+        </div>
+
+      </div>
+      {% endif %}
+
+      <!-- Teacher Save Section -->
+      <div class="section-card teacher-card">
+
+        <h3 class="section-title">Save Evaluation</h3>
+
+        <form method="post" class="approval-form">
+          {% csrf_token %}
+
+          <label>Marks</label>
+          <input
+            type="number"
+            name="marks"
+            value="{% if submission.marks is not None %}{{ submission.marks }}{% elif ai_marks_suggestion is not None %}{{ ai_marks_suggestion }}{% endif %}"
+          >
+
+          <label>Teacher Feedback</label>
+          <textarea name="feedback" rows="4">{% if submission.feedback %}{{ submission.feedback }}{% elif ai_feedback_suggestion %}{{ ai_feedback_suggestion }}{% endif %}</textarea>
+
+          <button type="submit" class="btn btn-save">
+            Save
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="back-link">
+    <a href="{% url 'assignment_submissions' submission.assignment.id %}">
+      ← Back to submissions
+    </a>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.feedback-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.nextElementSibling.classList.toggle('active');
+  });
+});
+</script>
+
+{% endblock %}

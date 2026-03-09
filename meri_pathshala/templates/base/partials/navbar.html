@@ -1,0 +1,11 @@
+<nav class="main-nav">
+  <div class="nav-container">
+    <div class="nav-left"><a href="#" class="nav-brand"> Apna School </a></div>
+    <div class="nav-right">
+      <div class="nav-user">
+        User: <strong>{{ request.user.username|default:"Guest" }}</strong>
+      </div>
+      <a href="{% url 'logout' %}" class="nav-link"> Logout </a>
+    </div>
+  </div>
+</nav>

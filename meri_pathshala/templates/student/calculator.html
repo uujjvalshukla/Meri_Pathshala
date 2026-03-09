@@ -1,0 +1,130 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="calc-header">
+  <a href="{% url 'student_dashboard' %}" class="calc-back">
+    ⬅ Back to Dashboard
+  </a>
+</div>
+
+<div class="calculator">
+  <input type="text" id="display" class="display" readonly />
+
+  <div class="mode-row">
+    <button id="radBtn" type="button" onclick="setMode('RAD')" class="active">RAD</button>
+    <button id="degBtn" type="button" onclick="setMode('DEG')">DEG</button>
+
+    <button id="toggleSciBtn" type="button" onclick="toggleScientific()">Scientific</button>
+  </div>
+
+  <div class="buttons">
+    <!-- Basic -->
+    <button type="button" onclick="clearDisplay()">C</button>
+    <button type="button" onclick="backspace()">⌫</button>
+    <button type="button" onclick="append('(')">(</button>
+    <button type="button" onclick="append(')')">)</button>
+    <button type="button" onclick="append('/')">÷</button>
+
+    <button type="button" onclick="append('7')">7</button>
+    <button type="button" onclick="append('8')">8</button>
+    <button type="button" onclick="append('9')">9</button>
+    <button type="button" onclick="append('*')">×</button>
+
+    <button type="button" onclick="append('4')">4</button>
+    <button type="button" onclick="append('5')">5</button>
+    <button type="button" onclick="append('6')">6</button>
+    <button type="button" onclick="append('-')">−</button>
+
+    <button type="button" onclick="append('1')">1</button>
+    <button type="button" onclick="append('2')">2</button>
+    <button type="button" onclick="append('3')">3</button>
+    <button type="button" onclick="append('+')">+</button>
+
+    <button type="button" onclick="append('0')">0</button>
+    <button type="button" onclick="append('.')">.</button>
+    <button type="button" onclick="append('^')">^</button>
+    <button type="button" onclick="calculate()">=</button>
+  </div>
+
+  <!-- Scientific panel (hidden by default via CSS) -->
+  <div id="scientificPanel" class="buttons scientific hidden">
+    <button type="button" onclick="append('sqrt(')">√</button>
+    <button type="button" onclick="append('sin(')">sin</button>
+    <button type="button" onclick="append('cos(')">cos</button>
+    <button type="button" onclick="append('tan(')">tan</button>
+
+    <button type="button" onclick="append('asin(')">sin⁻¹</button>
+    <button type="button" onclick="append('acos(')">cos⁻¹</button>
+    <button type="button" onclick="append('atan(')">tan⁻¹</button>
+    <button type="button" onclick="append('log(')">log</button>
+
+    <button type="button" onclick="append('ln(')">ln</button>
+    <button type="button" onclick="append('exp(')">exp</button>
+    <button type="button" onclick="append('pi')">π</button>
+    <button type="button" onclick="append('E')">e</button>
+  </div>
+</div>
+
+<script>
+let mode = "RAD";
+let scientificOpen = false;
+
+function append(value) {
+  document.getElementById("display").value += value;
+}
+
+function clearDisplay() {
+  document.getElementById("display").value = "";
+}
+
+function backspace() {
+  const display = document.getElementById("display");
+  display.value = display.value.slice(0, -1);
+}
+
+function setMode(selectedMode) {
+  mode = selectedMode;
+
+  document.getElementById("radBtn").classList.remove("active");
+  document.getElementById("degBtn").classList.remove("active");
+
+  if (selectedMode === "RAD") document.getElementById("radBtn").classList.add("active");
+  else document.getElementById("degBtn").classList.add("active");
+}
+
+function toggleScientific() {
+  scientificOpen = !scientificOpen;
+  const panel = document.getElementById("scientificPanel");
+  panel.classList.toggle("hidden", !scientificOpen);
+
+  document.getElementById("toggleSciBtn").classList.toggle("active", scientificOpen);
+}
+
+function calculate() {
+  const expression = document.getElementById("display").value;
+
+  fetch("{% url 'calculate' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: "expression=" + encodeURIComponent(expression) + "&mode=" + mode
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.result !== undefined) {
+      document.getElementById("display").value = data.result;
+    } else {
+      document.getElementById("display").value = "Error";
+    }
+  })
+  .catch(() => {
+    document.getElementById("display").value = "Error";
+  });
+}
+</script>
+
+{% endblock %}
