@@ -51,11 +51,17 @@ def extract_text_from_file(uploaded_file_path):
 
     prompt_extract = """
 Extract all readable handwritten or printed text from this file.
-Return ONLY the text.
-Do NOT explain anything.
+
+Rules:
+- Return ONLY the extracted text, nothing else.
+- Each answer must start on a NEW LINE.
+- Put a blank line between each answer/question.
+- Preserve the original numbering (Ans 1, Ans 2, etc.)
+- Do NOT merge multiple answers into one paragraph.
+- Do NOT explain or add any extra text.
 """
 
-    # Detect MIME type
+    # Detect File type
     if uploaded_file_path.lower().endswith(".pdf"):
         mime_type = "application/pdf"
     elif uploaded_file_path.lower().endswith(".png"):

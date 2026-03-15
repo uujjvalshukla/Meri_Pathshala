@@ -10,14 +10,14 @@ from academics.models import SchoolClass, Subject
 @login_required
 def dashboard(request):
 
-    # ❗ Explicit role check (very clear)
+    # Explicit role check (very clear)
     if not request.user.groups.filter(name="Principal").exists():
         return HttpResponse("Access denied. Principal only.")
 
     return render(request, "principal/dashboard.html")
 
 
-#  --------------  2️⃣ Manage Users (Student + Teacher)   ----------------------------
+#  --------------   Manage Users (Student + Teacher)   ----------------------------
 
 
 @login_required
@@ -97,7 +97,7 @@ def manage_users(request):
     )
 
 
-#   -----------------  3️⃣ Delete Student  ------------------
+#   -----------------   Delete Student  ------------------
 
 
 @login_required
@@ -117,7 +117,7 @@ def delete_student(request, student_id):
     return redirect("principal_manage_users")
 
 
-#   ------------------  4️⃣ Delete Teacher   --------------
+#   ------------------   Delete Teacher   --------------
 
 
 @login_required
@@ -136,7 +136,7 @@ def delete_teacher(request, teacher_id):
     return redirect("principal_manage_users")
 
 
-#    ------------5️⃣ Assign Teacher to Class + Subject   --------------
+#    ------------ Assign Teacher to Class + Subject   --------------
 
 
 @login_required

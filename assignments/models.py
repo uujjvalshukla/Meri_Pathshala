@@ -8,7 +8,7 @@ class Assignment(models.Model):
     subject = models.ForeignKey("academics.Subject", on_delete=models.CASCADE)
     teacher = models.ForeignKey("account.TeacherProfile", on_delete=models.CASCADE)
     due_date = models.DateField()
-    total_marks = models.IntegerField(default=10)  # ✅ Now Store Max Marks
+    total_marks = models.IntegerField(default=10) 
 
     def __str__(self):
         return self.title

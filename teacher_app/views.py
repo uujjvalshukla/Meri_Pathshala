@@ -11,7 +11,7 @@ from ai.services import generate_assignment, process_and_evaluate_submission
 @login_required
 def dashboard(request):
 
-    # ❗ Explicit role check (easy to understand)
+    #   role check 
     if not hasattr(request.user, "teacherprofile"):
         return HttpResponse("Access denied. Teacher only.")
 
@@ -72,7 +72,7 @@ def create_assignment(request):
 @login_required
 def generate_ai_assignment(request):
 
-    # Explicit role check (beginner style)
+    # ==============    role check   =========
     if not hasattr(request.user, "teacherprofile"):
         return JsonResponse({"error": "Teacher only"}, status=403)
 
@@ -108,7 +108,7 @@ def assignment_submissions(request, assignment_id):
     assignment = get_object_or_404(
         Assignment,
         id=assignment_id,
-        teacher=teacher,  # 🔐 ownership check kept
+        teacher=teacher,  # =========    Ownership check     =============== 
     )
 
     submissions = Submission.objects.filter(assignment=assignment).select_related(
@@ -144,7 +144,7 @@ def submission_detail(request, submission_id):
 
     assignment_text = submission.assignment.description
 
-    # ✅ AI Evaluation ONLY when teacher clicks AI button (?ai=1)
+    # AI Evaluation ONLY when teacher clicks AI button (?ai=1)
     # ===============================
     # AI Evaluation (Suggestion Only)
     # ===============================
@@ -196,7 +196,7 @@ def submission_detail(request, submission_id):
             ai_marks = None
             ai_feedback = ai_result.strip()
 
-        # 🚨 Do NOT save to DB
+        #  ======    Do NOT save to DB  ===============
         return render(
             request,
             "teacher/submission_detail.html",
@@ -207,7 +207,7 @@ def submission_detail(request, submission_id):
             },
         )
 
-    # ✅ Manual Save by Teacher
+    #  Manual Save by Teacher
     if request.method == "POST":
         submission.marks = request.POST.get("marks") or None
         submission.feedback = request.POST.get("feedback")

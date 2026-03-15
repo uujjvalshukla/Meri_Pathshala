@@ -22,7 +22,7 @@ from sympy.parsing.sympy_parser import (
 @login_required
 def dashboard(request):
 
-    # ❗ Explicit role check (beginner friendly)
+    #    Explicit role check
     if not hasattr(request.user, "studentprofile"):
         return HttpResponse("Access denied. Student only.")
 
@@ -58,7 +58,7 @@ def dashboard(request):
     )
 
 
-#   ------------------     2️⃣ Assignment Detail + Submit   --------------------------
+#   ------------------      Assignment Detail + Submit   --------------------------
 
 
 @login_required
@@ -72,7 +72,7 @@ def assignment_detail(request, assignment_id):
     assignment = get_object_or_404(
         Assignment,
         id=assignment_id,
-        school_class=student.school_class,  # 🔐 safety check
+        school_class=student.school_class,  #  safety check
     )
 
     # Existing submission (if any)
@@ -81,7 +81,7 @@ def assignment_detail(request, assignment_id):
         student=student,
     ).first()
 
-    # 🔒 HARD LOCK: if teacher has checked, student cannot edit
+    #  HARD LOCK: if teacher has checked, student cannot edit
     if existing_submission and (
         existing_submission.marks is not None or existing_submission.feedback
     ):
