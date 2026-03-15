@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 
 from account.models import StudentProfile, TeacherProfile, TeacherClassSubject
 from academics.models import SchoolClass, Subject
-
+from assignments.models import Assignment,Submission
 
 @login_required
 def dashboard(request):
@@ -14,8 +14,12 @@ def dashboard(request):
     if not request.user.groups.filter(name="Principal").exists():
         return HttpResponse("Access denied. Principal only.")
 
-    return render(request, "principal/dashboard.html")
-
+    return render(request, "principal/dashboard.html", {
+        "student_count": StudentProfile.objects.count(),
+        "teacher_count": TeacherProfile.objects.count(),
+        "assignment_count": Assignment.objects.count(),
+        "superusers": User.objects.filter(is_superuser=True), # =====   This is Admin Pannel
+     })    
 
 #  --------------   Manage Users (Student + Teacher)   ----------------------------
 
@@ -179,3 +183,55 @@ def assign_teacher(request):
             "mappings": mappings,
         },
     )
+#   ==============   Show Student name and Teacher name  ===========      
+
+@login_required
+def student_list(request):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    students = StudentProfile.objects.select_related("user", "school_class").order_by("school_class__name")
+    return render(request, "principal/student_list.html", {"students": students})
+
+
+@login_required
+def student_detail(request, student_id):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    student = get_object_or_404(StudentProfile.objects.select_related("user", "school_class"), id=student_id)
+    submissions = Submission.objects.filter(student=student).select_related("assignment__subject")
+    return render(request, "principal/student_detail.html", {"student": student, "submissions": submissions})
+
+
+@login_required
+def teacher_list(request):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    teachers = TeacherProfile.objects.select_related("user").order_by("user__username")
+    return render(request, "principal/teacher_list.html", {"teachers": teachers})
+
+
+@login_required
+def teacher_detail(request, teacher_id):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    teacher = get_object_or_404(TeacherProfile.objects.select_related("user"), id=teacher_id)
+    teaching = TeacherClassSubject.objects.filter(teacher=teacher).select_related("school_class", "subject")
+    assignments = Assignment.objects.filter(teacher=teacher).select_related("school_class", "subject")
+    return render(request, "principal/teacher_detail.html", {"teacher": teacher, "teaching": teaching, "assignments": assignments})
+
+
+@login_required
+def assignment_list(request):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    assignments = Assignment.objects.select_related("teacher__user", "school_class", "subject").order_by("-id")
+    return render(request, "principal/assignment_list.html", {"assignments": assignments})
+
+
+@login_required
+def assignment_detail(request, assignment_id):
+    if not request.user.groups.filter(name="Principal").exists():
+        return HttpResponse("Access denied. Principal only.")
+    assignment = get_object_or_404(Assignment.objects.select_related("teacher__user", "school_class", "subject"), id=assignment_id)
+    submissions = Submission.objects.filter(assignment=assignment).select_related("student__user")
+    return render(request, "principal/assignment_detail.html", {"assignment": assignment, "submissions": submissions})

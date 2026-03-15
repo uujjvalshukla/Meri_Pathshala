@@ -15,4 +15,12 @@ urlpatterns = [
         views.delete_teacher,
         name="principal_delete_teacher",
     ),
+    # =========  This is For Show Teacher List and Student List = ===========
+    path("students/", views.student_list, name="principal_student_list"),
+    path("students/<int:student_id>/", views.student_detail, name="principal_student_detail"),
+    path("teachers/", views.teacher_list, name="principal_teacher_list"),
+    path("teachers/<int:teacher_id>/", views.teacher_detail, name="principal_teacher_detail"),
+    path("assignments/", views.assignment_list, name="principal_assignment_list"),
+    path("assignments/<int:assignment_id>/", views.assignment_detail, name="principal_assignment_detail"),
 ]
+

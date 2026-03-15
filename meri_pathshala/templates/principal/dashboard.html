@@ -10,20 +10,26 @@
   <!-- Stats -->
   <div class="stats-grid">
 
-    <div class="stat-card">
-      <div class="stat-label">Students</div>
-      <div class="stat-value">220</div>
-    </div>
+    <a href="{% url 'principal_student_list' %}" class="stat-card stat-link">
+  <div class="stat-icon">🎓</div>
+  <div class="stat-label">Students</div>
+  <div class="stat-value">{{ student_count }}</div>
+  <div class="stat-hint">View all →</div>
+</a>
 
-    <div class="stat-card">
-      <div class="stat-label">Teachers</div>
-      <div class="stat-value">18</div>
-    </div>
+<a href="{% url 'principal_teacher_list' %}" class="stat-card stat-link">
+  <div class="stat-icon">👨‍🏫</div>
+  <div class="stat-label">Teachers</div>
+  <div class="stat-value">{{ teacher_count }}</div>
+  <div class="stat-hint">View all →</div>
+</a>
 
-    <div class="stat-card">
-      <div class="stat-label">Assignments</div>
-      <div class="stat-value">35</div>
-    </div>
+<a href="{% url 'principal_assignment_list' %}" class="stat-card stat-link">
+  <div class="stat-icon">📋</div>
+  <div class="stat-label">Assignments</div>
+  <div class="stat-value">{{ assignment_count }}</div>
+  <div class="stat-hint">View all →</div>
+</a>
 
   </div>
 
@@ -34,24 +40,25 @@
       Quick Actions
     </div>
 
-    <div class="card-body action-list">
-
-      <a
-        href="{% url 'principal_manage_users' %}"
-        class="primary-action"
-      >
-        Manage Users
-      </a>
-
-      <a
-        href="{% url 'principal_assign_teacher' %}"
-        class="secondary-action"
-      >
-        Assign Teacher
-      </a>
-
-    </div>
+    <div class="card-body">
+  <div class="quick-actions-grid">
+    <a href="{% url 'principal_manage_users' %}" class="quick-action-card">
+      <div class="qa-icon">👥</div>
+      <div class="qa-label">Manage Users</div>
+      <div class="qa-desc">Add or remove students & teachers</div>
+    </a>
+    <a href="{% url 'principal_assign_teacher' %}" class="quick-action-card">
+      <div class="qa-icon">📌</div>
+      <div class="qa-label">Assign Teacher</div>
+      <div class="qa-desc">Assign teachers to classes & subjects</div>
+    </a>
+    <a href="/admin/" class="quick-action-card" target="_blank">
+  <div class="qa-icon">⚙️</div>
+  <div class="qa-label">Admin Panel</div>
+  <div class="qa-desc">Full admin panel access</div>
+</a>
   </div>
+</div>
 
 </div>
 

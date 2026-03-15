@@ -51,6 +51,12 @@
           <label>Due Date</label>
           <input type="date" name="due_date">
         </div>
+                <!-- Maximum Mark -->
+
+      <div class="form-field">
+          <label>Maximum Marks</label>
+          <input type="number" name="total_marks" value="{{ assignment.total_marks|default:10 }}" required>
+      </div>
 
         <div class="form-actions">
           <button type="submit">
@@ -105,10 +111,7 @@
     </div>
     {% comment %}            Give max mark in asssignment              {% endcomment %}
     
-       <div class="form-field">
-  <label>Maximum Marks</label>
-  <input type="number" name="max_marks" value="{{ assignment.max_marks|default:10 }}" required>
-       </div>
+       
   </div>
 
 </div>

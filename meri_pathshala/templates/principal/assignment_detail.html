@@ -1,0 +1,84 @@
+{% extends "base/base.html" %}
+{% block title %}Assignment Detail{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <a href="{% url 'principal_assignment_list' %}">⬅ Back to Assignments</a>
+
+  <h3 class="page-heading">{{ assignment.title }}</h3>
+
+  <!-- Assignment Info -->
+  <div class="card">
+    <div class="card-header">Assignment Details</div>
+    <div class="card-body">
+      <table class="data-table">
+        <tr>
+          <th>Teacher</th>
+          <td>{{ assignment.teacher.user.username }}</td>
+        </tr>
+        <tr>
+          <th>Class</th>
+          <td>{{ assignment.school_class.name }}</td>
+        </tr>
+        <tr>
+          <th>Subject</th>
+          <td>{{ assignment.subject.name }}</td>
+        </tr>
+        <tr>
+          <th>Due Date</th>
+          <td>{{ assignment.due_date }}</td>
+        </tr>
+        <tr>
+          <th>Total Marks</th>
+          <td>{{ assignment.total_marks }}</td>
+        </tr>
+        <tr>
+          <th>Description</th>
+          <td>{{ assignment.description|linebreaks }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Submissions -->
+  <div class="card mt-3">
+    <div class="card-header">
+      Submissions ({{ submissions.count }})
+    </div>
+    <div class="card-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Submitted At</th>
+            <th>Marks</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+          <tr>
+            <td>
+              <a href="{% url 'principal_student_detail' sub.student.id %}">
+                {{ sub.student.user.username }}
+              </a>
+            </td>
+            <td>{{ sub.submitted_at }}</td>
+            <td>{{ sub.marks|default:"-" }}</td>
+            <td>{{ sub.feedback|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="empty-text">No submissions yet</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

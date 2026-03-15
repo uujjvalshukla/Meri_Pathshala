@@ -511,6 +511,8 @@ button:disabled,
   border-radius: var(--r-lg);
   border: 1px solid rgba(255,255,255,0.10);
   box-shadow: var(--shadow-sm);
+   
+transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .stat-label {
@@ -536,6 +538,76 @@ button:disabled,
   border-radius: var(--r-lg);
   border: 1px solid rgba(255,255,255,0.10);
 }
+/* =========================================================
+   PRINCIPAL DASHBOARD — new classes only
+========================================================= */
+.stat-link {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-link:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124,58,237,0.45);
+  box-shadow: 0 20px 50px rgba(124,58,237,0.18);
+}
+
+.stat-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.stat-hint {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(124,58,237,0.80);
+  margin-top: 4px;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.quick-action-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(124,58,237,0.40);
+  background: rgba(124,58,237,0.08);
+}
+
+.qa-icon {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.qa-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+}
+
+.qa-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
+
+
 
 /* =========================================================
    NAVBAR (templates/base/partials/navbar.html)

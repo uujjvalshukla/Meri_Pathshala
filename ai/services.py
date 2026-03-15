@@ -36,51 +36,114 @@ Rules:
 
 
 # ==================================================
-# Extract Text From File (OCR) → 1 API CALL
+# Extract Text From File → Supports All File Types
 # ==================================================
 def extract_text_from_file(uploaded_file_path):
     """
     Extracts text from:
-    - PDF
-    - PNG
-    - JPG / JPEG
+    - PDF        → Gemini
+    - DOCX       → python-docx (local)
+    - DOC        → python-docx (local, best effort)
+    - TXT        → direct read (local)
+    - XLSX       → openpyxl (local)
+    - JPEG / JPG → Gemini
+    - PNG        → Gemini
     """
 
     if not os.path.exists(uploaded_file_path):
         return ""
 
+    file_lower = uploaded_file_path.lower()
+
+    # --------------------------------------------------
+    # TXT — direct read, 
+    # --------------------------------------------------
+    if file_lower.endswith(".txt"):
+        try:
+            with open(uploaded_file_path, "r", encoding="utf-8", errors="ignore") as f:
+                return f.read().strip()
+        except Exception:
+            return ""
+
+    # --------------------------------------------------
+    # DOCX — extract using python-docx
+    
+    # --------------------------------------------------
+    if file_lower.endswith(".docx"):
+        try:
+            import docx
+            doc = docx.Document(uploaded_file_path)
+            paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+            return "\n".join(paragraphs)
+        except Exception:
+            return ""
+
+    # --------------------------------------------------
+    # DOC — extract using python-docx (best effort)
+    
+    # --------------------------------------------------
+    if file_lower.endswith(".doc"):
+        try:
+            import docx
+            doc = docx.Document(uploaded_file_path)
+            paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+            return "\n".join(paragraphs)
+        except Exception:
+            return ""
+
+    # --------------------------------------------------
+    # XLSX — extract using openpyxl
+    
+    # --------------------------------------------------
+    if file_lower.endswith(".xlsx"):
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(uploaded_file_path, data_only=True)
+            lines = []
+            for sheet in wb.worksheets:
+                for row in sheet.iter_rows(values_only=True):
+                    row_text = "  ".join(
+                        str(cell) for cell in row if cell is not None
+                    )
+                    if row_text.strip():
+                        lines.append(row_text)
+            return "\n".join(lines)
+        except Exception:
+            return ""
+
+    # --------------------------------------------------
+    # PDF, PNG, JPEG, JPG → Gemini Vision
+    # --------------------------------------------------
+    if file_lower.endswith(".pdf"):
+        mime_type = "application/pdf"
+    elif file_lower.endswith(".png"):
+        mime_type = "image/png"
+    elif file_lower.endswith(".jpg") or file_lower.endswith(".jpeg"):
+        mime_type = "image/jpeg"
+    else:
+        # Unsupported file type — return empty safely
+        return ""
+
     prompt_extract = """
 Extract all readable handwritten or printed text from this file.
-
-Rules:
-- Return ONLY the extracted text, nothing else.
-- Each answer must start on a NEW LINE.
-- Put a blank line between each answer/question.
-- Preserve the original numbering (Ans 1, Ans 2, etc.)
-- Do NOT merge multiple answers into one paragraph.
-- Do NOT explain or add any extra text.
+Return ONLY the text.
+Do NOT explain anything.
 """
 
-    # Detect File type
-    if uploaded_file_path.lower().endswith(".pdf"):
-        mime_type = "application/pdf"
-    elif uploaded_file_path.lower().endswith(".png"):
-        mime_type = "image/png"
-    else:
-        mime_type = "image/jpeg"
-
-    with open(uploaded_file_path, "rb") as f:
-        response = model.generate_content(
-            [
-                prompt_extract,
-                {
-                    "mime_type": mime_type,
-                    "data": f.read(),
-                },
-            ]
-        )
-
-    return response.text.strip()
+    try:
+        with open(uploaded_file_path, "rb") as f:
+            response = model.generate_content(
+                [
+                    prompt_extract,
+                    {
+                        "mime_type": mime_type,
+                        "data": f.read(),
+                    },
+                ]
+            )
+        return response.text.strip()
+    except Exception:
+        return ""
 
 
 # ==================================================
@@ -93,14 +156,17 @@ def evaluate_submission(assignment_text, student_answer, max_marks=10):
     """
 
     prompt_evaluate = f"""
-You are a strict school teacher.
+You are a strict school teacher evaluating a student's assignment.
 
-Total Marks for this test: {max_marks}
+Total Marks: {max_marks}
 
-IMPORTANT:
-- Divide marks logically based on number of questions.
-- If a question is partially correct, give partial marks.
-- If a question is not attempted, give 0.
+MARKING RULES:
+- First count the total number of questions in the assignment below.
+- Each question carries EQUAL marks = {max_marks} divided by total number of questions.
+- If a question is fully correct, give full marks for that question.
+- If a question is partially correct, give partial marks for that question.
+- If a question is NOT attempted at all, give 0 for that question.
+- Add up all question marks to get the final total.
 - Final marks MUST NOT exceed {max_marks}.
 - Final format must be exactly: Marks: <number>/{max_marks}
 
@@ -113,7 +179,7 @@ Student Answer:
 Return EXACT format:
 
 Detailed Analysis:
-<Question-wise feedback>
+<Question-wise feedback, show marks awarded per question like "Q1: 8/10 — reason">
 
 Overall Feedback:
 <Summary>
@@ -135,16 +201,21 @@ def process_and_evaluate_submission(
     max_marks=10,
 ):
     """
+    Supported file types:
+    - PDF, DOCX, DOC, TXT, XLSX → text extraction
+    - JPEG, JPG, PNG             → Gemini Vision OCR
+
     Maximum API Calls:
     - 0 calls → If no answer
-    - 1 call → If only text
-    - 2 calls → If file + evaluation
+    - 1 call  → If only text answer
+    - 1 call  → If only image/PDF file (OCR + eval combined in 2 calls)
+    - 2 calls → File (OCR) + Evaluation
     """
 
     extracted_text = ""
 
     # ==========================
-    # Call 1: OCR (if file exists)
+    # Step 1: Extract from file
     # ==========================
     if uploaded_file_path:
         extracted_text = extract_text_from_file(uploaded_file_path)
@@ -171,7 +242,7 @@ def process_and_evaluate_submission(
         }
 
     # ==========================
-    # Call 2: Evaluation
+    # Step 2: Evaluate
     # ==========================
     evaluation_result = evaluate_submission(
         assignment_text,
