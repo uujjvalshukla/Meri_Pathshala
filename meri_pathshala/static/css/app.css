@@ -1401,3 +1401,11 @@ select option:hover{
   background: #2563eb;
   color: #ffffff !important;
 }
+
+.assignment-description {
+  font-size: 15px;
+  line-height: 2.0;
+  color: rgba(255,255,255,0.82);
+  font-family: Georgia, "Times New Roman", serif;
+  white-space: normal;   /* CRITICAL: pre-wrap breaks MathJax */
+}

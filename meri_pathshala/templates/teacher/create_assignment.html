@@ -100,6 +100,20 @@
     </div>
 
     <div class="form-field">
+  <label>Subject</label>
+  <input id="ai-subject" placeholder="e.g. Math, Physics, English">
+</div>
+
+<div class="form-field">
+  <label>Difficulty</label>
+  <select id="ai-difficulty">
+    <option value="Easy">Easy</option>
+    <option value="Medium" selected>Medium</option>
+    <option value="Hard">Hard</option>
+  </select>
+</div>
+
+    <div class="form-field">
       <label>No. of Questions</label>
       <input id="ai-count" type="number" value="10">
     </div>
@@ -124,6 +138,8 @@ function generateAI() {
   const cls = document.getElementById("ai-class").value;
   const chapter = document.getElementById("ai-chapter").value;
   const count = document.getElementById("ai-count").value;
+  const subject = document.getElementById("ai-subject").value;
+  const difficulty = document.getElementById("ai-difficulty").value;
 
   if (!chapter) {
     alert("Please enter chapter name");
@@ -140,7 +156,9 @@ function generateAI() {
       board: board,
       class_name: cls,
       chapter: chapter,
-      num_questions: count
+      num_questions: count,
+      subject: subject,        
+      difficulty: difficulty,
     })
   })
   .then(res => res.json())

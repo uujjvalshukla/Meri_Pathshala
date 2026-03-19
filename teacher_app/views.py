@@ -11,7 +11,7 @@ from ai.services import generate_assignment, process_and_evaluate_submission
 @login_required
 def dashboard(request):
 
-    #   role check 
+    #   role check
     if not hasattr(request.user, "teacherprofile"):
         return HttpResponse("Access denied. Teacher only.")
 
@@ -81,12 +81,16 @@ def generate_ai_assignment(request):
         class_name = request.POST.get("class_name")
         chapter = request.POST.get("chapter")
         num_questions = request.POST.get("num_questions")
+        subject = request.POST.get("subject", "")
+        difficulty = request.POST.get("difficulty", "Medium")
 
         text = generate_assignment(
             board=board,
             class_name=class_name,
             chapter=chapter,
             num_questions=num_questions,
+            subject=subject,
+            difficulty=difficulty,
         )
 
         return JsonResponse({"assignment": text})
@@ -108,7 +112,7 @@ def assignment_submissions(request, assignment_id):
     assignment = get_object_or_404(
         Assignment,
         id=assignment_id,
-        teacher=teacher,  # =========    Ownership check     =============== 
+        teacher=teacher,  # =========    Ownership check     ===============
     )
 
     submissions = Submission.objects.filter(assignment=assignment).select_related(
@@ -222,5 +226,37 @@ def submission_detail(request, submission_id):
             "submission": submission,
             "ai_marks_suggestion": None,
             "ai_feedback_suggestion": None,
+        },
+    )
+
+
+# Teacher can view our assignments
+
+
+@login_required
+def assignment_detail(request, assignment_id):
+
+    if not hasattr(request.user, "teacherprofile"):
+        return HttpResponse("Access denied. Teacher only.")
+
+    teacher = request.user.teacherprofile
+
+    assignment = get_object_or_404(
+        Assignment,
+        id=assignment_id,
+        teacher=teacher,  # ownership check
+    )
+
+    submission_count = Submission.objects.filter(assignment=assignment).count()
+
+    return render(
+        request,
+        "student/assignment_detail.html",  # reusing student template
+        {
+            "assignment": assignment,
+            "submission_count": submission_count,
+            "locked": True,  # hides the submit form, shows only the questions
+            "submission": None,
+            "back_url": "/teacher/dashboard/",
         },
     )

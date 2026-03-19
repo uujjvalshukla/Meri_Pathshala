@@ -9,7 +9,7 @@
  
   <!-- Breadcrumb -->
   <div style="margin-bottom:20px;">
-    <a href="{% url 'student_dashboard' %}" style="color:rgba(255,255,255,0.50); font-size:13px; font-weight:700; text-decoration:none;">
+    <a href="{{ back_url }}" style="color:rgba(255,255,255,0.50); font-size:13px; font-weight:700; text-decoration:none;">
       ← Back to Dashboard
     </a>
   </div>
@@ -28,8 +28,9 @@
  
     <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;">
  
-    <div style="font-size:14px; line-height:1.8; color:rgba(255,255,255,0.80); white-space:pre-wrap;">{{ assignment.description }}</div>
-  </div>
+
+<div class="assignment-description">{{ assignment.description|linebreaksbr }}</div> 
+ </div>
  
   <!-- ══════════════════════════════════════
        CASE 1: Locked — Teacher has evaluated
@@ -151,5 +152,14 @@
   {% endif %}
  
 </div>
- 
+ <a href="{% url 'calculator' %}" style="
+    display:inline-flex; align-items:center; gap:6px;
+    padding:9px 16px;
+    background: linear-gradient(180deg, rgba(124,58,237,0.95), rgba(79,70,229,0.95));
+    color:#fff; font-size:13px; font-weight:700;
+    border-radius:12px; text-decoration:none;
+    border:1px solid rgba(124,58,237,0.35);
+  ">
+    🧮 Calculator
+  </a>
 {% endblock %}

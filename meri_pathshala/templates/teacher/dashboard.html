@@ -38,7 +38,11 @@
         <tbody>
           {% for a in assignments %}
           <tr>
-            <td>{{ a.title }}</td>
+            <td>
+              <a href="{% url 'teacher_assignment_detail' a.id %}" class="action-link">
+                  {{ a.title }}
+              </a>  
+            </td>
             <td>{{ a.school_class.name }}</td>
             <td>{{ a.subject.name }}</td>
             <td>{{ a.due_date }}</td>

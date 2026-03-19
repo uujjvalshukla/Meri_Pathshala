@@ -8,7 +8,21 @@ import re
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 
-from sympy import sin, cos, tan, asin, acos, atan, log, exp, sqrt, pi, E
+from sympy import (
+    sin,
+    cos,
+    tan,
+    asin,
+    acos,
+    atan,
+    log,
+    exp,
+    sqrt,
+    pi,
+    E,
+    simplify,
+    nsimplify,
+)
 from sympy.parsing.sympy_parser import (
     parse_expr,
     standard_transformations,
@@ -92,6 +106,7 @@ def assignment_detail(request, assignment_id):
                 "assignment": assignment,
                 "submission": existing_submission,
                 "locked": True,
+                "back_url": "/student/dashboard/",
             },
         )
 
@@ -121,6 +136,7 @@ def assignment_detail(request, assignment_id):
             "assignment": assignment,
             "submission": existing_submission,
             "locked": False,
+            "back_url": "/student/dashboard/",
         },
     )
 
@@ -310,9 +326,21 @@ def evaluate_expression(request):
         # DEG/RAD adjustments
         expr = _convert_deg_rad(expr, mode)
 
-        # Numeric result like a real calculator
-        result = expr.evalf(12)  # 12-digit precision
-        return JsonResponse({"result": str(result)})
+        # Try to keep exact symbolic result first
+        simplified = simplify(expr)
+        if simplified.is_number:
+            # Try to express as exact fraction/radical
+            rational = nsimplify(
+                simplified, [pi, sqrt(2), sqrt(3), sqrt(5), sqrt(6)], rational=False
+            )
+            # Only use exact form if it's reasonably simple
+            if len(str(rational)) < 30:
+                return JsonResponse({"result": str(rational)})
+        # Fall back to decimal
+        result = expr.evalf(12)
+        # Clean up trailing zeros
+        result_str = str(result).rstrip("0").rstrip(".")
+        return JsonResponse({"result": result_str})
 
     except Exception:
         return JsonResponse({"error": "Invalid Expression"}, status=400)

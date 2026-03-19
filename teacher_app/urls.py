@@ -17,4 +17,9 @@ urlpatterns = [
         views.submission_detail,
         name="teacher_submission_detail",
     ),
+    path(
+        "assignment/<int:assignment_id>/",
+        views.assignment_detail,
+        name="teacher_assignment_detail",
+    ),
 ]

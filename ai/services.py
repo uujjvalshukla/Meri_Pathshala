@@ -3,18 +3,20 @@ from django.conf import settings
 import os
 
 # ==================================================
-# Configure Gemini (Only Once)
+# Configure Gemini
 # ==================================================
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# Create model instance ONCE (Very Important)
+# Choose model
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 # ==================================================
 # Generate Assignment
 # ==================================================
-def generate_assignment(board, class_name, chapter, num_questions):
+def generate_assignment(
+    board, class_name, chapter, num_questions, subject="", difficulty="Medium"
+):
     prompt = f"""
 Create a school assignment strictly based on the following details:
 
@@ -22,13 +24,37 @@ Board: {board}
 Class: {class_name}
 Chapter: {chapter}
 Number of questions: {num_questions}
+Difficulty Level: {difficulty}
+Subject: {subject}
 
-Rules:
-1. Do not add any extra text
-2. Do not add explanations or answers
-3. Start directly from Question 1
-4. Format clearly as numbered questions
-5. Follow NCERT textbook style
+
+STRICT FORMATTING RULES — follow exactly:
+1. Write ALL math expressions using LaTeX notation:
+   - Fractions: \\frac{{numerator}}{{denominator}}  → example: \\frac{{3}}{{4}}
+   - Square root: \\sqrt{{x}}
+   - Powers: x^{{2}}
+   - Inline math: wrap in single dollar signs like $\\frac{{1}}{{2}}$
+   - Display math (standalone equation): wrap in double dollar signs like $$x^2 + y^2 = z^2$$
+2. Write questions exactly like a printed NCERT textbook — clear, simple English sentences.
+3. Do NOT write raw fractions like 3/4 or (3)/(4) — always use $\\frac{{3}}{{4}}$
+4. Do NOT write "sqrt(x)" — always use $\\sqrt{{x}}$
+5. Start directly from Question 1. No preamble, no title, no extra text.
+6. Number each question: 1.  2.  3.  etc.
+7. Sub-parts should be labeled: (i), (ii), (iii) etc.
+8. Keep each question on its own line with a blank line between questions.
+9. Follow NCERT style — practical, real-world word problems where appropriate.
+10. Do NOT add answers or solutions.
+11. Difficulty must match: Easy = direct formula-based, Medium = multi-step problems, Hard = proof/application/higher-order thinking.
+12. Questions must be appropriate for {subject} subject, Class {class_name}.
+ 
+Example of CORRECT format:
+1.  A fraction becomes $\\frac{{9}}{{11}}$ when 2 is added to both the numerator and denominator. Find the original fraction.
+ 
+2.  Solve for $x$:
+$$\\frac{{1}}{{x+4}} - \\frac{{1}}{{x-7}} = \\frac{{11}}{{30}}, \\quad x \\neq -4, 7$$
+ 
+Now generate {num_questions} questions for Chapter: {chapter}, Class {class_name}.
+
 """
 
     response = model.generate_content(prompt)
@@ -56,7 +82,7 @@ def extract_text_from_file(uploaded_file_path):
     file_lower = uploaded_file_path.lower()
 
     # --------------------------------------------------
-    # TXT — direct read, 
+    # TXT — direct read,
     # --------------------------------------------------
     if file_lower.endswith(".txt"):
         try:
@@ -67,11 +93,12 @@ def extract_text_from_file(uploaded_file_path):
 
     # --------------------------------------------------
     # DOCX — extract using python-docx
-    
+
     # --------------------------------------------------
     if file_lower.endswith(".docx"):
         try:
             import docx
+
             doc = docx.Document(uploaded_file_path)
             paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
             return "\n".join(paragraphs)
@@ -80,11 +107,12 @@ def extract_text_from_file(uploaded_file_path):
 
     # --------------------------------------------------
     # DOC — extract using python-docx (best effort)
-    
+
     # --------------------------------------------------
     if file_lower.endswith(".doc"):
         try:
             import docx
+
             doc = docx.Document(uploaded_file_path)
             paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
             return "\n".join(paragraphs)
@@ -93,18 +121,17 @@ def extract_text_from_file(uploaded_file_path):
 
     # --------------------------------------------------
     # XLSX — extract using openpyxl
-    
+
     # --------------------------------------------------
     if file_lower.endswith(".xlsx"):
         try:
             import openpyxl
+
             wb = openpyxl.load_workbook(uploaded_file_path, data_only=True)
             lines = []
             for sheet in wb.worksheets:
                 for row in sheet.iter_rows(values_only=True):
-                    row_text = "  ".join(
-                        str(cell) for cell in row if cell is not None
-                    )
+                    row_text = "  ".join(str(cell) for cell in row if cell is not None)
                     if row_text.strip():
                         lines.append(row_text)
             return "\n".join(lines)

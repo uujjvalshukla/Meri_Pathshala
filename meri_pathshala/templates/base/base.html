@@ -6,12 +6,39 @@
 
   <!-- MAIN CSS -->
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
+
+  <!--
+    MathJax v3 — renders LaTeX like \frac{1}{2}, \sqrt{x}, x^2
+    RULES:
+      1. Config block MUST be before the loader <script>
+      2. Do NOT use async — causes race condition with page content
+      3. Do NOT put 'pre' in skipHtmlTags if math is inside pre elements
+  -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true,
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea',
+                       'annotation', 'annotation-xml'],
+      },
+      startup: {
+        typeset: true,
+      }
+    };
+  </script>
+  <!-- No async: must finish before page interaction -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 </head>
 <body>
 
 {% include "base/partials/navbar.html" %}
 {% include "base/partials/alerts.html" %}
-
 
   <div class="container">
     {% block content %}{% endblock %}
